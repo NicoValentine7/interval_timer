@@ -14,9 +14,9 @@ class SettingsPage extends ConsumerWidget {
     // WidgetRef refを追加して、Riverpodの機能をこの関数内で使えるようにしました➕
 
     // FIXME: 左によってるので中央上に寄せる
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: const ColorDropdown(), // 色を選択するドロップダウンメニューを表示します🎨
+        child: ColorDropdown(), // 色を選択するドロップダウンメニューを表示します🎨
       ),
     );
   }
@@ -100,7 +100,7 @@ class ColorItems {
           child: Center(
             child: Text(
               entry.value, // 色の名前を表示します🏷 黄色 -> Yellow
-              style: TextStyle(color: Colors.white), // テキストの色を設定します🖋
+              style: const TextStyle(color: Colors.white), // テキストの色を設定します🖋
             ),
           ),
         ),
