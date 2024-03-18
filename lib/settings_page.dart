@@ -8,10 +8,48 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(
-      body: Center(
-        child: ColorDropdown(),
+    return GestureDetector(
+      onHorizontalDragEnd: (details) => _handleHorizontalDrag(details, context),
+      child: const Scaffold(
+        body: Center(
+          child: ColorDropdown(),
+        ),
       ),
+    );
+  }
+
+  void _handleHorizontalDrag(DragEndDetails details, BuildContext context) {
+    // 右スワイプ👉の検出
+    if (details.primaryVelocity! > 0) {
+      _navigateToTimerPage(context);
+    }
+  }
+
+  void _navigateToTimerPage(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, secondaryAnimation) => TimerPage(),
+        transitionsBuilder: _transitionBuilder,
+      ),
+    );
+  }
+
+  Widget _transitionBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    const begin = Offset(-1.0, 0.0); // 左から開始🛫
+    const end = Offset.zero;
+    const curve = Curves.ease;
+
+    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    final offsetAnimation = animation.drive(tween);
+
+    return SlideTransition(
+      position: offsetAnimation,
+      child: child,
     );
   }
 }
@@ -29,52 +67,60 @@ class ColorDropdown extends ConsumerWidget {
     final dropdownColor = selectedColor;
 
     return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          color: selectedColor,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: Colors.white,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black,
-              blurRadius: 5,
-            ),
-          ],
+      child: ColorDropdownContainer(selectedColor: dropdownColor, ref: ref),
+    );
+  }
+}
+
+class ColorDropdownContainer extends StatelessWidget {
+  final Color selectedColor;
+  final WidgetRef ref;
+
+  const ColorDropdownContainer({
+    required this.selectedColor,
+    required this.ref,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: selectedColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.white,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 3),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<Color>(
-            value: dropdownColor,
-            icon: const Icon(Icons.arrow_downward),
-            style: const TextStyle(color: Colors.white),
-            onChanged: (Color? newValue) async {
-              if (newValue != null) {
-                await _setColor(newValue, context, ref);
-              }
-            },
-            items: ColorItems().getDropdownItems(),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 5,
           ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 3),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<Color>(
+          value: selectedColor,
+          icon: const Icon(Icons.arrow_downward),
+          style: const TextStyle(color: Colors.white),
+          onChanged: (Color? newValue) => _setColor(newValue, context),
+          items: _getDropdownItems(),
         ),
       ),
     );
   }
 
-  Future<void> _setColor(
-    Color color,
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    ref.read(selectedColorProvider.notifier).state = color;
-    ref.read(backgroundColorProvider.notifier).state = color;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('color', color.value);
+  Future<void> _setColor(Color? color, BuildContext context) async {
+    if (color != null) {
+      ref.read(selectedColorProvider.notifier).state = color;
+      ref.read(backgroundColorProvider.notifier).state = color;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('color', color.value);
+    }
   }
-}
 
-class ColorItems {
-  List<DropdownMenuItem<Color>> getDropdownItems() {
+  List<DropdownMenuItem<Color>> _getDropdownItems() {
     final colorNames = {
       Colors.blue: "Blue",
       Colors.red: "Red",
