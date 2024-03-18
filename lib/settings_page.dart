@@ -26,15 +26,24 @@ class ColorDropdown extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedColor = ref.watch(selectedColorProvider);
-    final Color dropdownColor = selectedColor;
+    final dropdownColor = selectedColor;
 
     return Center(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.deepPurple.withOpacity(0.5),
+          color: selectedColor,
           borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Colors.white,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black,
+              blurRadius: 5,
+            ),
+          ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 3),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<Color>(
             value: dropdownColor,
@@ -53,10 +62,14 @@ class ColorDropdown extends ConsumerWidget {
   }
 
   Future<void> _setColor(
-      Color color, BuildContext context, WidgetRef ref) async {
+    Color color,
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     ref.read(selectedColorProvider.notifier).state = color;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selectedColor', color.value);
+    ref.read(backgroundColorProvider.notifier).state = color;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('color', color.value);
   }
 }
 
@@ -66,8 +79,6 @@ class ColorItems {
       Colors.blue: "Blue",
       Colors.red: "Red",
       Colors.black: "Black",
-      Colors.white: "White",
-      Colors.yellow: "Yellow",
       Colors.green: "Green",
     };
     return colorNames.entries.map<DropdownMenuItem<Color>>((entry) {
