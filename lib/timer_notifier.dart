@@ -15,7 +15,8 @@ class TimerState {
 }
 
 class TimerNotifier extends StateNotifier<TimerState> {
-  TimerNotifier() : super(TimerState(remainingTime: 60));
+  TimerNotifier({required int initialDuration})
+      : super(TimerState(remainingTime: initialDuration));
 
   Timer? _timer;
 
@@ -44,7 +45,3 @@ class TimerNotifier extends StateNotifier<TimerState> {
     super.dispose();
   }
 }
-
-final timerProvider = StateNotifierProvider<TimerNotifier, TimerState>((ref) {
-  return TimerNotifier();
-});

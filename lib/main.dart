@@ -11,6 +11,14 @@ final backgroundColorProvider = StateProvider<Color>((ref) {
   return Colors.black26;
 });
 
+// TimerNotifierの初期化にtimerDurationを渡すためのProvider
+final timerProvider = StateNotifierProvider<TimerNotifier, TimerState>((ref) {
+  // ここでtimerDurationを使用するためのロジックが必要ですが、
+  // timerDurationは非同期で取得する必要があるため、この方法では適切に扱えません。
+  // 初期化時に適切な値を設定する別の方法を検討する必要があります。
+  return TimerNotifier(initialDuration: 60); // 仮の値で初期化
+});
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
@@ -18,11 +26,16 @@ void main() async {
   final savedColor =
       savedColorValue != null ? Color(savedColorValue) : Colors.blue;
 
+  final timerDuration = prefs.getInt('timerDuration') ?? 60; // デフォルト値は60秒
+
   runApp(
     ProviderScope(
       overrides: [
         backgroundColorProvider.overrideWith(
           (ref) => savedColor,
+        ),
+        timerProvider.overrideWith(
+          (ref) => TimerNotifier(initialDuration: timerDuration),
         ),
       ],
       child: const MyApp(),
@@ -54,6 +67,7 @@ class TimerPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final timerState = ref.watch(timerProvider);
     final timerNotifier = ref.read(timerProvider.notifier);
+    final backgroundColor = ref.watch(backgroundColorProvider);
 
     return GestureDetector(
       onHorizontalDragEnd: (details) {
@@ -73,10 +87,10 @@ class TimerPage extends ConsumerWidget {
             controller: _controller,
             isReverse: true,
             innerFillGradient:
-                const LinearGradient(colors: [Colors.white, Colors.red]),
+                const LinearGradient(colors: [Colors.white, Colors.green]),
             neonGradient:
-                const LinearGradient(colors: [Colors.white, Colors.red]),
-            backgroudColor: Colors.grey[800],
+                const LinearGradient(colors: [Colors.white, Colors.green]),
+            backgroudColor: backgroundColor,
             neonColor: Colors.orange,
             neon: 10,
             autoStart: false,

@@ -73,14 +73,13 @@ class ColorDropdown extends ConsumerWidget {
 }
 
 class ColorDropdownContainer extends StatelessWidget {
-  final Color selectedColor;
-  final WidgetRef ref;
-
   const ColorDropdownContainer({
     required this.selectedColor,
     required this.ref,
     super.key,
   });
+  final Color selectedColor;
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
@@ -141,5 +140,32 @@ class ColorDropdownContainer extends StatelessWidget {
         ),
       );
     }).toList();
+  }
+}
+
+class TimerDurationSetting extends StatelessWidget {
+  const TimerDurationSetting({required this.ref, super.key});
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: const InputDecoration(
+        labelText: 'タイマーの時間（秒）',
+        border: OutlineInputBorder(),
+      ),
+      keyboardType: TextInputType.number,
+      onSubmitted: (value) {
+        final duration = int.tryParse(value);
+        if (duration != null) {
+          _setTimerDuration(duration, context);
+        }
+      },
+    );
+  }
+
+  Future<void> _setTimerDuration(int duration, BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('timerDuration', duration);
   }
 }
