@@ -1,5 +1,14 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// TimerNotifierの初期化にtimerDurationを渡すためのProvider
+final timerProvider = StateNotifierProvider<TimerNotifier, TimerState>((ref) {
+  // ここでtimerDurationを使用するためのロジックが必要ですが、
+  // timerDurationは非同期で取得する必要があるため、この方法では適切に扱えません。
+  // 初期化時に適切な値を設定する別の方法を検討する必要があります。
+  return TimerNotifier(initialDuration: 60); // 仮の値で初期化
+});
 
 class TimerState {
   TimerState({required this.remainingTime, this.isRunning = false});
@@ -36,7 +45,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   void stopTimer() {
     _timer?.cancel();
-    state = state.copyWith(isRunning: false, remainingTime: 60);
+    final newState = state.copyWith(
+        isRunning: false); // Removed resetting remainingTime to 60
+    saveTimerDuration(newState.remainingTime); // SharedPreferencesに保存
+    state = newState;
+  }
+
+  Future<void> saveTimerDuration(int duration) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('timerDuration', duration);
   }
 
   @override

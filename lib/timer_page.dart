@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:interval_timer/main.dart';
 import 'package:interval_timer/settings_page.dart';
+import 'package:interval_timer/timer_notifier.dart';
 import 'package:neon_circular_timer/neon_circular_timer.dart';
 
 class TimerPage extends ConsumerWidget {

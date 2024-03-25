@@ -11,14 +11,6 @@ final backgroundColorProvider = StateProvider<Color>((ref) {
   return Colors.black26;
 });
 
-// TimerNotifierの初期化にtimerDurationを渡すためのProvider
-final timerProvider = StateNotifierProvider<TimerNotifier, TimerState>((ref) {
-  // ここでtimerDurationを使用するためのロジックが必要ですが、
-  // timerDurationは非同期で取得する必要があるため、この方法では適切に扱えません。
-  // 初期化時に適切な値を設定する別の方法を検討する必要があります。
-  return TimerNotifier(initialDuration: 60); // 仮の値で初期化
-});
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
