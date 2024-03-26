@@ -18,8 +18,7 @@ void main() async {
   final savedColor =
       savedColorValue != null ? Color(savedColorValue) : Colors.blue;
 
-  final timerDuration = prefs.getInt('timerDuration') ?? 60; // デフォルト値は60秒
-
+  const timerDuration = 60; // デフォルト値は60秒
   runApp(
     ProviderScope(
       overrides: [
